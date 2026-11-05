@@ -107,9 +107,9 @@ final class BuildController {
             }
 
             if (this.originalHotbarSlot < 0) {
-                this.originalHotbarSlot = client.player.getInventory().selected;
+                this.originalHotbarSlot = client.player.getInventory().getSelectedSlot();
             }
-            client.player.getInventory().selected = slot;
+            client.player.getInventory().setSelectedSlot(slot);
             this.lookAt(client, hit.getLocation());
             client.gameMode.useItemOn(client.player, InteractionHand.MAIN_HAND, hit);
             client.player.swing(InteractionHand.MAIN_HAND);
@@ -168,7 +168,11 @@ final class BuildController {
         Vec3 eye = client.player.getEyePosition();
         for (Direction side : Direction.values()) {
             BlockPos support = target.relative(side);
-            Vec3 hitPoint = Vec3.atCenterOf(support).add(Vec3.atLowerCornerOf(side.getOpposite().getNormal()).scale(0.5));
+            Direction face = side.getOpposite();
+            Vec3 hitPoint = Vec3.atCenterOf(support).add(
+                    face.getStepX() * 0.5,
+                    face.getStepY() * 0.5,
+                    face.getStepZ() * 0.5);
             if (eye.distanceToSqr(hitPoint) > REACH * REACH) {
                 continue;
             }
@@ -197,7 +201,7 @@ final class BuildController {
 
     private void restoreHotbar(Minecraft client) {
         if (this.originalHotbarSlot >= 0 && client.player != null) {
-            client.player.getInventory().selected = this.originalHotbarSlot;
+            client.player.getInventory().setSelectedSlot(this.originalHotbarSlot);
         }
         this.originalHotbarSlot = -1;
     }
